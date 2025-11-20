@@ -1,19 +1,7 @@
-import { useEffect } from "react";
-import { OpenApi } from "./api/openapi";
+import Router from "./router";
 
 const App = () => {
-  const fetchData = async () => {
-    const { data } = await OpenApi.fetchData(1);
-    console.log(data);
-  }
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  return (
-    <div>App</div>
-  )
+  return <Router />
 }
 
 export default App
