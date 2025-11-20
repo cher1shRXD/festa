@@ -1,16 +1,34 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { auth } from "../firebase";
+import { signOut } from "firebase/auth";
 import { OpenApi } from "../api/openapi";
 import type { OpenApiItem } from "../types/open-api-response";
 
 const Home = () => {
   const [festivals, setFestivals] = useState<OpenApiItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(auth.currentUser);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [numOfRows] = useState(9);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const fetchFestivals = async () => {
+      setLoading(true);
       try {
-        const response = await OpenApi.fetchData(1);
-        setFestivals(response.data.getFestivalKr.item.slice(0, 6));
+        const response = await OpenApi.fetchData(currentPage);
+        setFestivals(response.data.getFestivalKr.item);
+        setTotalCount(response.data.getFestivalKr.totalCount);
       } catch (error) {
         console.error("Failed to fetch festivals:", error);
       } finally {
@@ -19,7 +37,16 @@ const Home = () => {
     };
 
     fetchFestivals();
-  }, []);
+  }, [currentPage]);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -32,7 +59,27 @@ const Home = () => {
               <div className="text-sm opacity-90">|</div>
               <div className="text-sm">축제정보시스템</div>
             </div>
-            <div className="text-xs">BUSAN FESTIVAL</div>
+            <div className="flex items-center space-x-4">
+              <div className="text-xs">BUSAN FESTIVAL</div>
+              {user ? (
+                <div className="flex items-center space-x-3">
+                  <span className="text-xs">{user.email}</span>
+                  <button
+                    onClick={handleLogout}
+                    className="text-xs bg-white text-[#003876] px-3 py-1 hover:bg-gray-100 transition-colors"
+                  >
+                    로그아웃
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => navigate("/login")}
+                  className="text-xs bg-white text-[#003876] px-3 py-1 hover:bg-gray-100 transition-colors"
+                >
+                  로그인
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -177,6 +224,94 @@ const Home = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!loading && totalCount > 0 && (
+            <div className="mt-12 flex justify-center items-center space-x-2">
+              <button
+                onClick={() => {
+                  setCurrentPage(1);
+                  document.getElementById('festivals')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                disabled={currentPage === 1}
+                className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                처음
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentPage(currentPage - 1);
+                  document.getElementById('festivals')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                disabled={currentPage === 1}
+                className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                이전
+              </button>
+
+              <div className="flex space-x-1">
+                {Array.from({ length: Math.min(5, Math.ceil(totalCount / numOfRows)) }, (_, i) => {
+                  const totalPages = Math.ceil(totalCount / numOfRows);
+                  let pageNum;
+
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => {
+                        setCurrentPage(pageNum);
+                        document.getElementById('festivals')?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className={`px-4 py-2 border text-sm font-medium ${
+                        currentPage === pageNum
+                          ? 'bg-[#003876] text-white border-[#003876]'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={() => {
+                  setCurrentPage(currentPage + 1);
+                  document.getElementById('festivals')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                disabled={currentPage >= Math.ceil(totalCount / numOfRows)}
+                className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                다음
+              </button>
+              <button
+                onClick={() => {
+                  setCurrentPage(Math.ceil(totalCount / numOfRows));
+                  document.getElementById('festivals')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                disabled={currentPage >= Math.ceil(totalCount / numOfRows)}
+                className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                마지막
+              </button>
+            </div>
+          )}
+
+          {/* Page Info */}
+          {!loading && totalCount > 0 && (
+            <div className="mt-4 text-center text-sm text-gray-600">
+              전체 {totalCount}개 중 {((currentPage - 1) * numOfRows) + 1}~{Math.min(currentPage * numOfRows, totalCount)}개 표시 (페이지 {currentPage}/{Math.ceil(totalCount / numOfRows)})
             </div>
           )}
         </div>
