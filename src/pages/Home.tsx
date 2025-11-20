@@ -174,6 +174,7 @@ const Home = () => {
                 <div
                   key={festival.UC_SEQ}
                   className="bg-white border border-gray-300 hover:border-[#003876] transition-colors cursor-pointer overflow-hidden"
+                  onClick={() => navigate(`/festivals/${festival.UC_SEQ}`)}
                 >
                   <div className="h-48 bg-gray-200 relative overflow-hidden">
                     {festival.MAIN_IMG_NORMAL ? (
