@@ -8,6 +8,7 @@ import {
   where,
   onSnapshot,
   deleteDoc,
+  updateDoc,
   doc,
   Timestamp,
 } from "firebase/firestore";
@@ -24,6 +25,8 @@ const CommentSection = ({ festivalId }: CommentSectionProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -97,6 +100,39 @@ const CommentSection = ({ festivalId }: CommentSectionProps) => {
     } catch (error) {
       console.error("댓글 삭제 실패:", error);
       alert("댓글 삭제에 실패했습니다.");
+    }
+  };
+
+  const handleStartEdit = (comment: Comment) => {
+    setEditingCommentId(comment.id);
+    setEditContent(comment.content);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditContent("");
+  };
+
+  const handleUpdateComment = async (commentId: string) => {
+    if (!editContent.trim()) {
+      alert("댓글 내용을 입력해주세요.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await updateDoc(doc(db, "comments", commentId), {
+        content: editContent.trim(),
+        updatedAt: Timestamp.now().toMillis(),
+      });
+
+      setEditingCommentId(null);
+      setEditContent("");
+    } catch (error) {
+      console.error("댓글 수정 실패:", error);
+      alert("댓글 수정에 실패했습니다.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -180,22 +216,59 @@ const CommentSection = ({ festivalId }: CommentSectionProps) => {
                   </span>
                   <span className="text-sm text-gray-500 ml-2">
                     {formatDate(comment.createdAt)}
+                    {comment.updatedAt && " (수정됨)"}
                   </span>
                 </div>
 
-                {user && user.uid === comment.userId && (
-                  <button
-                    onClick={() => handleDeleteComment(comment.id)}
-                    className="text-sm text-red-600 hover:text-red-800 transition-colors"
-                  >
-                    삭제
-                  </button>
+                {user && user.uid === comment.userId && editingCommentId !== comment.id && (
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleStartEdit(comment)}
+                      className="text-sm text-[#003876] hover:text-[#00509e] transition-colors"
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={() => handleDeleteComment(comment.id)}
+                      className="text-sm text-red-600 hover:text-red-800 transition-colors"
+                    >
+                      삭제
+                    </button>
+                  </div>
                 )}
               </div>
 
-              <p className="text-gray-700 whitespace-pre-wrap">
-                {comment.content}
-              </p>
+              {editingCommentId === comment.id ? (
+                <div className="space-y-2">
+                  <textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    className="w-full border border-gray-300 px-4 py-3 focus:outline-none focus:border-[#003876] resize-none"
+                    rows={3}
+                    disabled={loading}
+                  />
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      onClick={handleCancelEdit}
+                      disabled={loading}
+                      className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors disabled:opacity-50"
+                    >
+                      취소
+                    </button>
+                    <button
+                      onClick={() => handleUpdateComment(comment.id)}
+                      disabled={loading || !editContent.trim()}
+                      className="bg-[#003876] text-white px-4 py-2 text-sm font-medium hover:bg-[#00509e] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {loading ? "수정 중..." : "수정 완료"}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-gray-700 whitespace-pre-wrap">
+                  {comment.content}
+                </p>
+              )}
             </div>
           ))
         )}
