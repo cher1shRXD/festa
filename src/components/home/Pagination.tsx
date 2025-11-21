@@ -1,3 +1,5 @@
+import { useLanguage } from "../../hooks/useLanguage";
+
 interface PaginationProps {
   currentPage: number;
   totalCount: number;
@@ -6,6 +8,7 @@ interface PaginationProps {
 }
 
 const Pagination = ({ currentPage, totalCount, numOfRows, onPageChange }: PaginationProps) => {
+  const { t } = useLanguage();
   const totalPages = Math.ceil(totalCount / numOfRows);
 
   const handlePageChange = (page: number) => {
@@ -40,20 +43,20 @@ const Pagination = ({ currentPage, totalCount, numOfRows, onPageChange }: Pagina
 
   return (
     <>
-      <div className="mt-12 flex justify-center items-center space-x-2">
+      <div className="mt-8 sm:mt-12 flex justify-center items-center space-x-1 sm:space-x-2">
         <button
           onClick={() => handlePageChange(1)}
           disabled={currentPage === 1}
-          className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+          className="px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 bg-white text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
         >
-          처음
+          {t.pagination.first}
         </button>
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+          className="px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 bg-white text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
         >
-          이전
+          {t.pagination.prev}
         </button>
 
         <div className="flex space-x-1">
@@ -61,7 +64,7 @@ const Pagination = ({ currentPage, totalCount, numOfRows, onPageChange }: Pagina
             <button
               key={pageNum}
               onClick={() => handlePageChange(pageNum)}
-              className={`px-4 py-2 border text-sm font-medium ${
+              className={`px-2 sm:px-4 py-1 sm:py-2 border text-xs sm:text-sm font-medium ${
                 currentPage === pageNum
                   ? 'bg-[#003876] text-white border-[#003876]'
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
@@ -75,21 +78,27 @@ const Pagination = ({ currentPage, totalCount, numOfRows, onPageChange }: Pagina
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+          className="px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 bg-white text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
         >
-          다음
+          {t.pagination.next}
         </button>
         <button
           onClick={() => handlePageChange(totalPages)}
           disabled={currentPage >= totalPages}
-          className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+          className="px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 bg-white text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
         >
-          마지막
+          {t.pagination.last}
         </button>
       </div>
 
-      <div className="mt-4 text-center text-sm text-gray-600">
-        전체 {totalCount}개 중 {((currentPage - 1) * numOfRows) + 1}~{Math.min(currentPage * numOfRows, totalCount)}개 표시 (페이지 {currentPage}/{totalPages})
+      <div className="mt-3 sm:mt-4 text-center text-xs sm:text-sm text-gray-600">
+        {t.pagination.showing(
+          ((currentPage - 1) * numOfRows) + 1,
+          Math.min(currentPage * numOfRows, totalCount),
+          totalCount,
+          currentPage,
+          totalPages
+        )}
       </div>
     </>
   );

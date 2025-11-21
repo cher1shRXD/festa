@@ -5,11 +5,13 @@ import type { OpenApiItem } from "../types/open-api-response";
 import CommentSection from "../components/CommentSection";
 import { Header, Footer } from "../components/home";
 import { useAuth } from "../hooks/useAuth";
+import { useLanguage } from "../hooks/useLanguage";
 
 const Detail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, handleLogout } = useAuth();
+  const { t } = useLanguage();
   const [festival, setFestival] = useState<OpenApiItem | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -48,12 +50,12 @@ const Detail = () => {
         <Header user={user} onLogout={handleLogout} />
         <div className="max-w-7xl mx-auto px-4 py-20 text-center">
           <p className="text-gray-600 text-lg mb-4">
-            축제 정보를 찾을 수 없습니다.
+            {t.detail.notFound}
           </p>
           <button
             onClick={() => navigate("/")}
             className="bg-[#003876] text-white px-6 py-3 font-medium hover:bg-[#00509e] transition-colors">
-            목록으로 돌아가기
+            {t.detail.backToList}
           </button>
         </div>
       </div>
@@ -64,7 +66,6 @@ const Detail = () => {
     <div className="min-h-screen bg-white">
       <Header user={user} onLogout={handleLogout} />
 
-      {/* Back Button Section */}
       <section className="bg-gray-50 border-b border-gray-200 py-4">
         <div className="max-w-7xl mx-auto px-4">
           <button
@@ -82,32 +83,32 @@ const Detail = () => {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            목록으로 돌아가기
+            {t.detail.backToList}
           </button>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="py-8 px-4">
+      <section className="py-6 sm:py-8 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Title Section */}
-          <div className="mb-6">
-            <div className="flex items-center space-x-3 mb-3">
-              <span className="bg-[#003876] text-white px-3 py-1 text-sm font-medium">
+          <div className="mb-4 sm:mb-6">
+            <div className="flex items-center space-x-2 sm:space-x-3 mb-2 sm:mb-3">
+              <span className="bg-[#003876] text-white px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium">
                 {festival.GUGUN_NM}
               </span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">
               {festival.MAIN_TITLE}
             </h1>
             {festival.SUBTITLE && (
-              <p className="text-lg text-gray-600">{festival.SUBTITLE}</p>
+              <p className="text-base sm:text-lg text-gray-600">{festival.SUBTITLE}</p>
             )}
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {/* Left Column - Image and Content */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               {/* Main Image */}
               {festival.MAIN_IMG_NORMAL && (
                 <div className="w-full aspect-video bg-gray-200 overflow-hidden border border-gray-300">
@@ -124,12 +125,12 @@ const Detail = () => {
 
               {/* Description */}
               {festival.ITEMCNTNTS && (
-                <div className="bg-white border border-gray-300 p-6">
-                  <h2 className="text-xl font-bold mb-4 text-gray-900 border-b-2 border-[#003876] pb-2">
-                    축제 소개
+                <div className="bg-white border border-gray-300 p-4 sm:p-6">
+                  <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-gray-900 border-b-2 border-[#003876] pb-2">
+                    {t.detail.sections.introduction}
                   </h2>
                   <div
-                    className="text-gray-700 leading-relaxed"
+                    className="text-gray-700 leading-relaxed text-sm sm:text-base"
                     dangerouslySetInnerHTML={{ __html: festival.ITEMCNTNTS }}
                   />
                 </div>
@@ -137,11 +138,11 @@ const Detail = () => {
 
               {/* Traffic Info */}
               {festival.TRFC_INFO && (
-                <div className="bg-white border border-gray-300 p-6">
-                  <h2 className="text-xl font-bold mb-4 text-gray-900 border-b-2 border-[#003876] pb-2">
-                    교통 정보
+                <div className="bg-white border border-gray-300 p-4 sm:p-6">
+                  <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-gray-900 border-b-2 border-[#003876] pb-2">
+                    {t.detail.sections.traffic}
                   </h2>
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-line text-sm sm:text-base">
                     {festival.TRFC_INFO}
                   </p>
                 </div>
@@ -150,9 +151,9 @@ const Detail = () => {
 
             {/* Right Column - Information */}
             <div className="lg:col-span-1">
-              <div className="bg-gray-50 border border-gray-300 p-6 sticky top-4">
-                <h2 className="text-xl font-bold mb-4 text-gray-900 border-b-2 border-[#003876] pb-2">
-                  상세 정보
+              <div className="bg-gray-50 border border-gray-300 p-4 sm:p-6 sticky top-4">
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-gray-900 border-b-2 border-[#003876] pb-2">
+                  {t.detail.sections.detailInfo}
                 </h2>
 
                 <div className="space-y-4">
@@ -174,7 +175,7 @@ const Detail = () => {
                         </svg>
                         <div>
                           <div className="font-bold text-sm text-gray-900 mb-1">
-                            기간
+                            {t.detail.fields.period}
                           </div>
                           <div className="text-sm text-gray-700">
                             {festival.USAGE_DAY}
@@ -202,7 +203,7 @@ const Detail = () => {
                         </svg>
                         <div>
                           <div className="font-bold text-sm text-gray-900 mb-1">
-                            운영시간
+                            {t.detail.fields.time}
                           </div>
                           <div className="text-sm text-gray-700">
                             {festival.USAGE_DAY_WEEK_AND_TIME}
@@ -236,7 +237,7 @@ const Detail = () => {
                         </svg>
                         <div>
                           <div className="font-bold text-sm text-gray-900 mb-1">
-                            장소
+                            {t.detail.fields.location}
                           </div>
                           <div className="text-sm text-gray-700">
                             {festival.PLACE}
@@ -264,7 +265,7 @@ const Detail = () => {
                         </svg>
                         <div>
                           <div className="font-bold text-sm text-gray-900 mb-1">
-                            주소
+                            {t.detail.fields.address}
                           </div>
                           <div className="text-sm text-gray-700">
                             {festival.ADDR1}
@@ -293,7 +294,7 @@ const Detail = () => {
                         </svg>
                         <div>
                           <div className="font-bold text-sm text-gray-900 mb-1">
-                            이용요금
+                            {t.detail.fields.fee}
                           </div>
                           <div className="text-sm text-gray-700">
                             {festival.USAGE_AMOUNT}
@@ -321,7 +322,7 @@ const Detail = () => {
                         </svg>
                         <div>
                           <div className="font-bold text-sm text-gray-900 mb-1">
-                            문의전화
+                            {t.detail.fields.contact}
                           </div>
                           <div className="text-sm text-gray-700">
                             {festival.CNTCT_TEL}
@@ -349,7 +350,7 @@ const Detail = () => {
                         </svg>
                         <div>
                           <div className="font-bold text-sm text-gray-900 mb-1">
-                            홈페이지
+                            {t.detail.fields.homepage}
                           </div>
                           <a
                             href={festival.HOMEPAGE_URL}

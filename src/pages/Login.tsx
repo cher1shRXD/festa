@@ -2,8 +2,11 @@ import { useState } from "react";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router";
+import { Header } from "../components/home";
+import { useLanguage } from "../hooks/useLanguage";
 
 const Login = () => {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
@@ -27,7 +30,7 @@ const Login = () => {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("로그인에 실패했습니다.");
+        setError(t.login.error);
       }
     } finally {
       setLoading(false);
@@ -36,37 +39,25 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-[#003876] text-white py-3 border-b-4 border-[#00509e]">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate("/")}>
-              <div className="font-bold text-lg">부산광역시</div>
-              <div className="text-sm opacity-90">|</div>
-              <div className="text-sm">축제정보시스템</div>
-            </div>
-            <div className="text-xs">BUSAN FESTIVAL</div>
-          </div>
-        </div>
-      </header>
+      <Header user={null} onLogout={() => {}} />
 
       {/* Login Form */}
-      <div className="flex items-center justify-center py-20 px-4">
+      <div className="flex items-center justify-center py-8 sm:py-12 md:py-20 px-4">
         <div className="w-full max-w-md">
-          <div className="bg-white border-2 border-gray-300 p-8">
-            <div className="mb-8 text-center border-b-2 border-[#003876] pb-4">
-              <h1 className="text-2xl font-bold text-gray-900">
-                {isSignUp ? "회원가입" : "로그인"}
+          <div className="bg-white border-2 border-gray-300 p-4 sm:p-6 md:p-8">
+            <div className="mb-6 sm:mb-8 text-center border-b-2 border-[#003876] pb-3 sm:pb-4">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                {isSignUp ? t.login.title.signUp : t.login.title.login}
               </h1>
-              <p className="text-sm text-gray-600 mt-2">
-                부산광역시 축제정보시스템
+              <p className="text-xs sm:text-sm text-gray-600 mt-2">
+                {t.login.subtitle}
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  이메일
+                <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                  {t.login.email.label}
                 </label>
                 <input
                   type="email"
@@ -74,14 +65,14 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-[#003876] transition-colors"
-                  placeholder="이메일을 입력하세요"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:outline-none focus:border-[#003876] transition-colors text-sm sm:text-base"
+                  placeholder={t.login.email.placeholder}
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  비밀번호
+                <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                  {t.login.password.label}
                 </label>
                 <input
                   type="password"
@@ -89,13 +80,13 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:border-[#003876] transition-colors"
-                  placeholder="비밀번호를 입력하세요"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 focus:outline-none focus:border-[#003876] transition-colors text-sm sm:text-base"
+                  placeholder={t.login.password.placeholder}
                 />
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 text-sm">
+                <div className="bg-red-50 border border-red-300 text-red-700 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
                   {error}
                 </div>
               )}
@@ -103,9 +94,9 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#003876] text-white py-3 font-medium hover:bg-[#00509e] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full bg-[#003876] text-white py-2 sm:py-3 font-medium hover:bg-[#00509e] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
               >
-                {loading ? "처리 중..." : isSignUp ? "회원가입" : "로그인"}
+                {loading ? t.login.button.processing : isSignUp ? t.login.button.signUp : t.login.button.login}
               </button>
 
               <div className="text-center">
@@ -115,20 +106,20 @@ const Login = () => {
                     setIsSignUp(!isSignUp);
                     setError("");
                   }}
-                  className="text-sm text-[#003876] hover:underline"
+                  className="text-xs sm:text-sm text-[#003876] hover:underline"
                 >
-                  {isSignUp ? "이미 계정이 있으신가요? 로그인" : "계정이 없으신가요? 회원가입"}
+                  {isSignUp ? t.login.toggle.toLogin : t.login.toggle.toSignUp}
                 </button>
               </div>
             </form>
           </div>
 
-          <div className="mt-6 bg-white border border-gray-200 p-4">
-            <h3 className="font-bold text-sm mb-2 text-gray-900">안내사항</h3>
+          <div className="mt-4 sm:mt-6 bg-white border border-gray-200 p-3 sm:p-4">
+            <h3 className="font-bold text-xs sm:text-sm mb-2 text-gray-900">{t.login.notice.title}</h3>
             <ul className="text-xs text-gray-600 space-y-1">
-              <li>• 부산광역시 축제정보시스템 이용을 위해 로그인이 필요합니다.</li>
-              <li>• 회원가입 시 이메일과 비밀번호를 입력해주세요.</li>
-              <li>• 비밀번호는 6자 이상이어야 합니다.</li>
+              {t.login.notice.items.map((item, index) => (
+                <li key={index}>• {item}</li>
+              ))}
             </ul>
           </div>
         </div>

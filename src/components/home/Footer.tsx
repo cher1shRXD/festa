@@ -1,50 +1,54 @@
+import { useLanguage } from "../../hooks/useLanguage";
+
 const Footer = () => {
+  const { t } = useLanguage();
+
   const footerSections = [
     {
-      title: "부산광역시",
-      subtitle: "축제정보시스템",
+      title: t.footer.mainTitle,
+      subtitle: t.footer.mainSubtitle,
       isMain: true
     },
     {
-      title: "이용안내",
+      title: t.footer.guide.title,
       links: [
-        { text: "축제 정보", href: "#" },
-        { text: "참여 방법", href: "#" },
-        { text: "공지사항", href: "#" }
+        { text: t.footer.guide.festivalInfo, href: "#" },
+        { text: t.footer.guide.howToParticipate, href: "#" },
+        { text: t.footer.guide.notice, href: "#" }
       ]
     },
     {
-      title: "정책정보",
+      title: t.footer.policy.title,
       links: [
-        { text: "이용약관", href: "#" },
-        { text: "개인정보처리방침", href: "#" },
-        { text: "저작권정책", href: "#" }
+        { text: t.footer.policy.terms, href: "#" },
+        { text: t.footer.policy.privacy, href: "#" },
+        { text: t.footer.policy.copyright, href: "#" }
       ]
     },
     {
-      title: "문의처",
+      title: t.footer.contact.title,
       contacts: [
-        "부산광역시청",
-        "전화: 051-120",
-        "평일 09:00~18:00"
+        t.footer.contact.office,
+        t.footer.contact.phone,
+        t.footer.contact.hours
       ]
     }
   ];
 
   return (
-    <footer className="bg-[#003876] text-white py-12 px-4 border-t-4 border-[#00509e]">
+    <footer className="bg-[#003876] text-white py-8 sm:py-12 px-4 border-t-4 border-[#00509e]">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-8 mb-8">
+        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
           {footerSections.map((section, index) => (
             <div key={index}>
-              <h3 className={`font-bold mb-3 ${section.isMain ? 'text-lg' : ''}`}>
+              <h3 className={`font-bold mb-2 sm:mb-3 ${section.isMain ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}>
                 {section.title}
               </h3>
               {section.subtitle && (
-                <p className="text-sm text-gray-300">{section.subtitle}</p>
+                <p className="text-xs sm:text-sm text-gray-300">{section.subtitle}</p>
               )}
               {section.links && (
-                <ul className="space-y-2 text-sm text-gray-300">
+                <ul className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-gray-300">
                   {section.links.map((link, linkIndex) => (
                     <li key={linkIndex}>
                       <a href={link.href} className="hover:text-white">
@@ -55,7 +59,7 @@ const Footer = () => {
                 </ul>
               )}
               {section.contacts && (
-                <ul className="space-y-2 text-sm text-gray-300">
+                <ul className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-gray-300">
                   {section.contacts.map((contact, contactIndex) => (
                     <li key={contactIndex}>{contact}</li>
                   ))}
@@ -64,9 +68,9 @@ const Footer = () => {
             </div>
           ))}
         </div>
-        <div className="border-t border-[#00509e] pt-6 text-sm text-gray-300">
-          <p>© 2025 부산광역시. All Rights Reserved.</p>
-          <p className="mt-2">본 사이트는 부산광역시 공공데이터를 활용하여 제작되었습니다.</p>
+        <div className="border-t border-[#00509e] pt-4 sm:pt-6 text-xs sm:text-sm text-gray-300">
+          <p>{t.footer.copyright}</p>
+          <p className="mt-2">{t.footer.notice}</p>
         </div>
       </div>
     </footer>
